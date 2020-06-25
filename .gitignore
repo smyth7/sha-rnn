@@ -1,7 +1,10 @@
 #local
 
 data/
-save/   
+save/
+venv/
+*.data
+
 
 
 # Byte-compiled / optimized / DLL files

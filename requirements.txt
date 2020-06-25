@@ -1,0 +1,3 @@
+# packages in environment at /opt/anaconda3/envs/sha-rnn:
+#
+# Name                    Version                   Build  Channel

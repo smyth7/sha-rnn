@@ -55,7 +55,7 @@ parser.add_argument('--seed', type=int, default=1111,
 parser.add_argument('--nonmono', type=int, default=5,
                     help='random seed')
 parser.add_argument('--cuda', action='store_false',
-                    help='use CUDA')
+                  help='use CUDA')
 parser.add_argument('--log-interval', type=int, default=200, metavar='N',
                     help='report interval')
 randomhash = ''.join(str(time.time()).split('.'))
