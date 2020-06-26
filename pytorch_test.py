@@ -14,3 +14,5 @@ print(device)
 x = x.to(device)  
 
 print(x)
+
+y=x.cuda()

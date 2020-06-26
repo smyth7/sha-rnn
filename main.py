@@ -13,6 +13,21 @@ import model
 
 from utils import batchify, get_batch, repackage_hidden, zero_hidden
 
+###############################################################################
+# Device check
+###############################################################################
+
+if torch.cuda.is_available():
+	dev = "cuda:0"
+else:
+	dev = "cpu"
+
+device = torch.device(dev)
+
+###############################################################################
+# Arg parser
+###############################################################################
+
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='data/penn/',
                     help='location of the data corpus')
@@ -170,12 +185,12 @@ if not criterion:
     criterion = SplitCrossEntropyLoss(args.emsize, splits=splits, verbose=False)
 ###
 if args.cuda:
-    model = model.cuda()
-    criterion = criterion.cuda()
+    model = model.to(device)
+    criterion = criterion.to(device)
 if False: # or args.jit:
     print('Jitting ...')
     model.eval()
-    model.lmr = torch.jit.trace(model.lmr, (torch.rand([args.bptt, args.batch_size, args.emsize]).cuda(), torch.rand([1, args.batch_size, args.emsize]).cuda()))
+    model.lmr = torch.jit.trace(model.lmr, (torch.rand([args.bptt, args.batch_size, args.emsize]).to(device), torch.rand([1, args.batch_size, args.emsize]).to(device)))
 #model = torch.jit.trace_module(model, torch.zeros((args.bptt, args.batch_size), dtype=torch.long))
 ###
 params = list(model.parameters()) + list(criterion.parameters())
@@ -296,10 +311,10 @@ def train(epoch=0):
 
         if batch % loss_every_n_batches == 0:
             loss = functools.reduce(lambda x, y: x + y, losses)
-            #print(losses)
-            #loss.backward()
-            with amp.scale_loss(loss, optimizer) as scaled_loss:
-                scaled_loss.backward()
+            print(losses)
+            loss.backward()
+            #with amp.scale_loss(loss, optimizer) as scaled_loss:
+             #   scaled_loss.backward()
 
             # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
             if args.clip: torch.nn.utils.clip_grad_norm_(params, args.clip)
@@ -370,8 +385,8 @@ try:
         print('Lookahead - k {} and alpha {}'.format(k, alpha))
         optimizer = Lookahead(base_optimizer=optimizer, k=k, alpha=alpha)
 
-    from apex import amp
-    model, optimizer = amp.initialize(model, optimizer, opt_level='O1')
+    #from apex import amp
+    #model, optimizer = amp.initialize(model, optimizer, opt_level='O1')
     #model, optimizer = amp.initialize(model, optimizer, opt_level='O2')
 
     for epoch in range(1, args.epochs+1):
