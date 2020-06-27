@@ -37,6 +37,9 @@ def batchify(data, bsz, args):
          device = torch.device(dev)
          data = data.to(device)
 
+    else:
+        print("Run out of 50ps? There are no gpu cards found here.")
+
     return data
 
 

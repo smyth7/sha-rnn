@@ -91,6 +91,7 @@ parser.add_argument('--when', nargs="+", type=int, default=[-1],
 args = parser.parse_args()
 args.tied = True
 
+
 # Set the random seed manually for reproducibility.
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
@@ -396,7 +397,8 @@ try:
             tmp = {}
             for prm in model.parameters():
                 tmp[prm] = prm.data.clone()
-                prm.data = optimizer.state[prm]['ax'].clone()
+                if 'ax' in optimizer.state[prm]:
+                    prm.data = optimizer.state[prm]['ax'].clone()
 
             val_loss2 = evaluate(val_data)
             print('-' * 89)
